@@ -1,5 +1,12 @@
 
 
+### [0.0.3](https://github.com/MorevM/console.css/compare/v0.0.2...v0.0.3) (2022-10-09)
+
+
+### Chores
+
+* Set the correct package scope ([4738745](https://github.com/MorevM/console.css/commit/47387459ef35e2d33b6203e871ae3a039fc9002e))
+
 ### [0.0.2](https://github.com/MorevM/console.css/compare/v0.0.1...v0.0.2) (2022-10-09)
 
 
