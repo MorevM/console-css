@@ -1,5 +1,12 @@
 
 
+### [0.0.4](https://github.com/MorevM/console.css/compare/v0.0.3...v0.0.4) (2022-10-09)
+
+
+### Chores
+
+* Set explicit `registry-url` ([9275376](https://github.com/MorevM/console.css/commit/9275376af1f9c9375f4b93946bd0c47124dc3d81))
+
 ### [0.0.3](https://github.com/MorevM/console.css/compare/v0.0.2...v0.0.3) (2022-10-09)
 
 
