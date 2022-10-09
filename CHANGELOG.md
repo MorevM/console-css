@@ -1,5 +1,12 @@
 
 
+### [0.0.2](https://github.com/MorevM/console.css/compare/v0.0.1...v0.0.2) (2022-10-09)
+
+
+### Chores
+
+* Set NPM token instead of GH ([8cb93d5](https://github.com/MorevM/console.css/commit/8cb93d59e0141bda14c0e8aaf64a791fd0475eea))
+
 ### 0.0.1 (2022-10-09)
 
 First release 🎉
