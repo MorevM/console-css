@@ -1,0 +1,23 @@
+{
+	"compilerOptions": {
+		"target": "ESNext",
+		"module": "UMD",
+		"moduleResolution": "Node",
+		"esModuleInterop": true,
+		"strict": true,
+		"strictNullChecks": true,
+		"forceConsistentCasingInFileNames": true,
+		"outDir": "./dist",
+		"checkJs": false,
+		"allowJs": false,
+		"skipLibCheck": true
+	},
+	"ts-node": {
+		"esm": true
+	},
+	"exclude": [
+		"__tests__",
+		"build",
+		"dist"
+	]
+}

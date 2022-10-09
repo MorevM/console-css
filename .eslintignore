@@ -1,0 +1,10 @@
+# Whitelist of used dot-files and directories
+!.github
+!.vscode
+!.*
+
+# Blacklist of dev/artifacts directories
+dist
+build
+coverage
+node_modules

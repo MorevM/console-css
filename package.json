@@ -1,0 +1,64 @@
+{
+	"name": "@morev/console.css",
+	"description": "Style browser console messages with CSS",
+	"type": "module",
+	"version": "0.0.0",
+	"private": false,
+	"license": "MIT",
+	"publishConfig": {
+		"access": "public",
+		"registry": "https://registry.npmjs.org/"
+	},
+	"author": {
+		"name": "Maxim Morev",
+		"email": "max.seainside@gmail.com"
+	},
+	"homepage": "https://github.com/MorevM/console.css#readme",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/MorevM/console.css"
+	},
+	"keywords": [],
+	"files": [
+		"dist"
+	],
+	"exports": {
+		".": {
+			"require": "./dist/console-css.cjs.js",
+			"import": "./dist/console-css.es.js"
+		}
+	},
+	"main": "./dist/console-css.cjs.js",
+	"module": "./dist/console-css.es.js",
+	"browser": "./dist/console-css.umd.js",
+	"types": "./dist/index.d.ts",
+	"scripts": {
+		"dev": "vite example --port=3000",
+		"build": "vite build",
+		"prepare": "husky install ./.husky",
+		"vscode-settings": "cp .vscode/settings.template.json .vscode/settings.json",
+		"release": "release-it --disable-metrics",
+		"lint": "yarn lint:eslint",
+		"lint:fix": "yarn lint:eslint:fix",
+		"lint:eslint": "eslint \"**/*.{js,json,json5,jsonc,yml,yaml}\"",
+		"lint:eslint:fix": "eslint \"**/*.{js,json,json5,jsonc,yml,yaml}\" --fix",
+		"test": "echo todo"
+	},
+	"dependencies": {
+		"@morev/helpers": "^1.11.0"
+	},
+	"devDependencies": {
+		"@morev/commitlint-config": "^0.1.1",
+		"@morev/eslint-config": "^17.6.1",
+		"@release-it/conventional-changelog": "^5.1.1",
+		"@types/jest": "^29.1.2",
+		"eslint": "^8.25.0",
+		"husky": "^8.0.1",
+		"jest": "^29.1.2",
+		"lint-staged": "^13.0.3",
+		"release-it": "^15.5.0",
+		"terser": "^5.15.1",
+		"vite": "^3.1.6",
+		"vite-plugin-dts": "^1.6.5"
+	}
+}
