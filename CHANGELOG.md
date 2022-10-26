@@ -1,5 +1,13 @@
 
 
+### [0.0.5](https://github.com/MorevM/console-css/compare/v0.0.4...v0.0.5) (2022-10-26)
+
+
+### Chores
+
+* Replace dot in package name with dash ([4b92598](https://github.com/MorevM/console-css/commit/4b925980d4a9d3c0e80e8f159e9e588c286e1b5b))
+* Upgrade all deps ([513147f](https://github.com/MorevM/console-css/commit/513147f4b4bd04c6aaaaac6ada5153cf0e7392ff))
+
 ### [0.0.4](https://github.com/MorevM/console-css/compare/v0.0.3...v0.0.4) (2022-10-09)
 
 
