@@ -18,7 +18,7 @@ English is preferred as it's more widely used, but feel free to use Russian if y
 
 Please use the provided issue/PR templates where possible. \
 There are various templates for asking a question, reporting a bug or requesting a new feature.
-* [Create an issue](https://github.com/MorevM/console.css/issues/new)
+* [Create an issue](https://github.com/MorevM/console-css/issues/new)
 * [Guide: Creating a pull request](https://help.github.com/articles/creating-a-pull-request/)
 
 ## ✒️ Ways to Contribute
@@ -57,7 +57,7 @@ There are various templates for asking a question, reporting a bug or requesting
 
 Пожалуйста, используйте шаблоны для создания `issue` и `PR`, где это возможно. \
 Используются разные шаблоны для того, чтобы задать вопрос, сообщить о баге или предложить новую функциональность.
-* [Задать вопрос / Сообщить о баге / Предложить новую функциональность](https://github.com/MorevM/console.css/issues/new)
+* [Задать вопрос / Сообщить о баге / Предложить новую функциональность](https://github.com/MorevM/console-css/issues/new)
 * [Гайд: Создание пул-реквеста [EN]](https://help.github.com/articles/creating-a-pull-request/)
 
 ## ✒️ Способы внести вклад

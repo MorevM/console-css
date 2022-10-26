@@ -1,5 +1,5 @@
 {
-	"name": "@morev/console.css",
+	"name": "@morev/console-css",
 	"description": "Style browser console messages with CSS",
 	"type": "module",
 	"version": "0.0.4",
@@ -13,10 +13,10 @@
 		"name": "Maxim Morev",
 		"email": "max.seainside@gmail.com"
 	},
-	"homepage": "https://github.com/MorevM/console.css#readme",
+	"homepage": "https://github.com/MorevM/console-css#readme",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/MorevM/console.css"
+		"url": "https://github.com/MorevM/console-css"
 	},
 	"keywords": [],
 	"files": [

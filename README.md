@@ -1,13 +1,13 @@
-# @morev/console.css
+# @morev/console-css
 
 The library to style browser console messages.
 
-![Stability of "master" branch](https://img.shields.io/github/workflow/status/MorevM/console.css/Build/master)
+![Stability of "master" branch](https://img.shields.io/github/workflow/status/MorevM/console-css/Build/master)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-![Last commit](https://img.shields.io/github/last-commit/morevm/console.css)
-![Release version](https://img.shields.io/github/v/release/morevm/console.css?include_prereleases)
-![GitHub Release Date](https://img.shields.io/github/release-date/morevm/console.css)
-![Keywords](https://img.shields.io/github/package-json/keywords/morevm/console.css)
+![Last commit](https://img.shields.io/github/last-commit/morevm/console-css)
+![Release version](https://img.shields.io/github/v/release/morevm/console-css?include_prereleases)
+![GitHub Release Date](https://img.shields.io/github/release-date/morevm/console-css)
+![Keywords](https://img.shields.io/github/package-json/keywords/morevm/console-css)
 
 ## Why?
 
@@ -36,7 +36,7 @@ The code doesn't look friendly, huh?
 **But there is another way:**
 
 ```js
-import ConsoleCSS from '@morev/console.css';
+import ConsoleCSS from '@morev/console-css';
 
 ConsoleCSS.add(`
   .letter {
@@ -65,19 +65,19 @@ ConsoleCSS.styled.log(`
 ### Using `yarn`
 
 ```bash
-yarn add @morev/console.css
+yarn add @morev/console-css
 ```
 
 ### Using `npm`
 
 ```bash
-npm install @morev/console.css
+npm install @morev/console-css
 ```
 
 ### Using `pnpm`
 
 ```bash
-pnpm add @morev/console.css
+pnpm add @morev/console-css
 ```
 
 ## Usage
@@ -100,7 +100,7 @@ By default, the package styles only well-known HTML tags:
 You may use inline styles:
 
 ```js
-import ConsoleCSS from '@morev/console.css';
+import ConsoleCSS from '@morev/console-css';
 
 ConsoleCSS.styled.log(`<b style="color: red;">Red bold text</b>`);
 ```
@@ -113,7 +113,7 @@ You can use `.add()` method multiple times.
 > This input string isn't validated, so make sure your CSS syntax is correct.
 
 ```ts
-import ConsoleCSS from '@morev/console.css';
+import ConsoleCSS from '@morev/console-css';
 
 ConsoleCSS.add(`
   .block { color: red; text-decoration: underline; }
@@ -127,7 +127,7 @@ ConsoleCSS.styled.log('<span class="block">Red underlined text</span>');
 That might be annoying to remember about custom styled messages class, so the library provides a way to replace global `window.console`
 
 ```ts
-import ConsoleCSS from '@morev/console.css';
+import ConsoleCSS from '@morev/console-css';
 
 // No matters before or after `.override()` call
 ConsoleCSS.add(`
