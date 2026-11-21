@@ -1,5 +1,3 @@
-export type CleanConsole = Omit<Console, 'Console'>;
-
 export type Declaration = {
 	/**
 	 * Type of supported CSS tokens.

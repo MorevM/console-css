@@ -1,23 +1,13 @@
 {
 	"compilerOptions": {
-		"target": "ESNext",
-		"module": "UMD",
-		"moduleResolution": "Node",
-		"esModuleInterop": true,
+		"target": "ES2020",
+		"module": "ESNext",
+		"moduleResolution": "Bundler",
+		"lib": ["ES2020", "DOM", "DOM.Iterable"],
+		"types": [],
 		"strict": true,
-		"strictNullChecks": true,
-		"forceConsistentCasingInFileNames": true,
-		"outDir": "./dist",
-		"checkJs": false,
-		"allowJs": false,
+		"noEmit": true,
 		"skipLibCheck": true
 	},
-	"ts-node": {
-		"esm": true
-	},
-	"exclude": [
-		"__tests__",
-		"build",
-		"dist"
-	]
+	"include": ["src", "tsdown.config.ts"]
 }

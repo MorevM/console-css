@@ -16,6 +16,9 @@ jobs:
       - name: Setup environment
         uses: ./.github/actions/setup
 
+      - name: Typecheck
+        run: pnpm typecheck
+
       - name: Linting
         run: pnpm lint
 

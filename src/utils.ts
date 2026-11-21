@@ -1,5 +1,5 @@
-import type { PlainObject } from '@morev/helpers';
-import { unquote } from '@morev/helpers';
+import type { PlainObject } from '@morev/utils';
+import { unquote } from '@morev/utils';
 
 /* eslint-disable @typescript-eslint/indent */
 const parseImageAttributes = (attrs: string) => attrs

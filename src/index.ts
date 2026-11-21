@@ -1,18 +1,17 @@
-import type { NonEmptyArray, ObjectKeys } from '@morev/helpers';
-import { isServer, isClient, arrayUnique, isString } from '@morev/helpers';
-import type { CleanConsole, Declaration } from './types';
+import { arrayUnique, isFunction, isServer, isString, tsObject } from '@morev/utils';
+import type { Declaration } from './types';
 import { replaceBetween, getChildNodes, formatImages } from './utils';
 
 class ConsoleCSS {
 	#declarations: Declaration[] = [];
 
-	#originalConsole: Console | null = isClient() ? window.console : null;
+	#originalConsole = console;
 
-	#restParams: any[] = [];
+	#restParams: unknown[] = [];
 
 	#isOverride: boolean = false;
 
-	#substitutions: string[] = [];
+	#substitutions: unknown[] = [];
 
 	/**
 	 * Overrides the `window.console` with `ConsoleCSS` to allow usage
@@ -41,7 +40,7 @@ class ConsoleCSS {
 	public restore() {
 		if (!this.#isOverride || isServer()) return;
 		this.#isOverride = false;
-		window.console = this.#originalConsole as Console;
+		window.console = this.#originalConsole;
 	}
 
 	/**
@@ -102,7 +101,7 @@ class ConsoleCSS {
 	 *
 	 * @returns   Mappings of original `window.console` methods.
 	 */
-	public get styled() {
+	public get styled(): Console {
 		return isServer() ? console : this.#map();
 	}
 
@@ -120,7 +119,6 @@ class ConsoleCSS {
 	}
 
 	#parseNode(html: string, inheritedStyles = ''): string {
-		if (!isString(html)) return html;
 		html = formatImages(html);
 		const children = getChildNodes(html);
 
@@ -167,7 +165,8 @@ class ConsoleCSS {
 		}, '');
 	}
 
-	#style(message: string, ...rest: any[]) {
+	#style(message: unknown, ...rest: unknown[]) {
+		if (!isString(message)) return [message, ...rest];
 		this.#restParams = rest;
 		const result = [this.#parseNode(message, ''), ...this.#substitutions];
 		this.#substitutions = [];
@@ -175,13 +174,14 @@ class ConsoleCSS {
 	}
 
 	#map() {
-		return (Object.keys(this.#originalConsole!) as ObjectKeys<CleanConsole>).reduce((acc, method) => {
-			/* @ts-expect-error -- `clear`, `groupEnd` expect no arguments, but it doesn't matters */
-			acc[method] = (...args: NonEmptyArray) => {
-				this.#originalConsole![method].apply(this, this.#style.apply(this, args)); // eslint-disable-line prefer-spread
-			};
-			return acc;
-		}, {} as Console); // eslint-disable-line @typescript-eslint/prefer-reduce-type-parameter
+		const original = this.#originalConsole;
+		const styled = { ...original };
+		for (const [method, callback] of tsObject.entries(original)) {
+			if (!isFunction(callback)) continue;
+			Reflect.set(styled, method, (message?: unknown, ...rest: unknown[]) =>
+				Reflect.apply(callback, original, this.#style(message, ...rest)));
+		}
+		return styled;
 	}
 }
 

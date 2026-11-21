@@ -1,0 +1,17 @@
+import { defineConfig } from 'tsdown';
+
+export default defineConfig({
+	entry: { 'console-css': 'src/index.ts' },
+	platform: 'neutral',
+	deps: { onlyBundle: ['@morev/utils'] },
+	target: 'es2020',
+	format: {
+		esm: {},
+		cjs: {},
+		umd: { dts: false },
+	},
+	globalName: 'ConsoleCSS',
+	dts: true,
+	minify: true,
+	outExtensions: ({ format }) => format === 'es' ? { js: '.es.js', dts: '.ts' } : undefined,
+});
