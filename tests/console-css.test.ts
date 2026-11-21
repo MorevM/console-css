@@ -89,4 +89,14 @@ describe('ConsoleCSS', () => {
 
 		expect(style.color).toBe('purple');
 	});
+
+	it('Keeps only the last occurrence of a repeated CSS block', () => {
+		const log = vi.spyOn(window.console, 'log').mockImplementation(() => {});
+		ConsoleCSS.add('.notice { color: red } .notice { color: blue }');
+		ConsoleCSS.add('.notice { color: red }');
+
+		ConsoleCSS.styled.log('<span class="notice">ok</span>');
+
+		expect(log).toHaveBeenCalledWith('%cok%c', 'color: blue;color: red', '');
+	});
 });

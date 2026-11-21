@@ -3,7 +3,7 @@ import { formatImages } from './utils';
 import type { Declaration } from './types';
 
 class ConsoleCSS {
-	#declarations: Declaration[] = [];
+	readonly #declarations = new Map<string, Declaration>();
 
 	#originalConsole = console;
 
@@ -20,7 +20,7 @@ class ConsoleCSS {
 		}
 
 		const classStyles: string[] = [];
-		for (const { type, entity, cssText } of this.#declarations) {
+		for (const { type, entity, cssText } of this.#declarations.values()) {
 			if (type === 'tag' && node.localName === entity) styles.push(cssText);
 			if (type === 'class' && node.classList.contains(entity)) classStyles.push(cssText);
 		}
@@ -115,7 +115,7 @@ class ConsoleCSS {
 	 *  ConsoleCSS.styled.log('<b>Just bold text</b>');
 	 */
 	public reset() {
-		this.#declarations = [];
+		this.#declarations.clear();
 	}
 
 	/**
@@ -143,7 +143,10 @@ class ConsoleCSS {
 
 			const type = name.startsWith('.') ? 'class' : 'tag';
 			const entity = type === 'class' ? name.slice(1) : name.toLowerCase();
-			this.#declarations.push({ type, entity, cssText });
+			const key = `${type}:${entity}{${cssText}}`;
+			// A repeated block takes its latest position in the cascade.
+			this.#declarations.delete(key);
+			this.#declarations.set(key, { type, entity, cssText });
 		}
 	}
 
