@@ -144,25 +144,20 @@ class ConsoleCSS {
 	 * @param   input   CSS-like string with custom rules.
 	 */
 	public add(input: string) {
-		(input.match(/.+?\s{.+?}/gs) ?? []).map((i) => i.replaceAll(/\s+/g, ' '))
-			.forEach((declaration) => {
-				const [_, _entity, _rules] = (declaration.match(/(.*){(.*)}/) ?? []).map((i) => i.trim());
-				if (!_entity || !_rules) return;
+		for (const [, selector, block] of input.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+			const name = selector.trim();
+			if (!name || !block.trim()) continue;
 
-				const type = _entity.startsWith('.') ? 'class' : 'tag';
-				const entity = _entity.startsWith('.') ? _entity.slice(1) : _entity.toLowerCase();
-				const rules = arrayUnique(_rules.split(';').map((r) => r.trim()).filter(Boolean));
-
-				const alreadyCreated = this.#declarations
-					.find((d) => d.type === type && d.entity === entity);
-
-				if (alreadyCreated) {
-					alreadyCreated.rules.push(...rules);
-					return;
-				}
-
+			const type = name.startsWith('.') ? 'class' : 'tag';
+			const entity = type === 'class' ? name.slice(1) : name.toLowerCase();
+			const rules = arrayUnique(block.split(';').map((rule) => rule.trim()).filter(Boolean));
+			const existing = this.#declarations.find((item) => item.type === type && item.entity === entity);
+			if (existing) {
+				existing.rules.push(...rules);
+			} else {
 				this.#declarations.push({ type, entity, rules });
-			});
+			}
+		}
 	}
 
 	/**

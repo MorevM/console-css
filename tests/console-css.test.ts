@@ -60,4 +60,15 @@ describe('ConsoleCSS', () => {
 			'',
 		);
 	});
+
+	it('Reads adjacent tag and class rules without spaces before braces', () => {
+		const log = vi.spyOn(window.console, 'log').mockImplementation(() => {});
+
+		ConsoleCSS.add('b{color: red}.notice{color: blue}');
+		ConsoleCSS.styled.log('<b>one</b><span class="notice">two</span>');
+
+		expect(log).toHaveBeenCalledWith(
+			'%cone%c%ctwo%c', expect.stringContaining('color: red'), '', expect.stringContaining('color: blue'), '',
+		);
+	});
 });
