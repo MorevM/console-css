@@ -23,11 +23,8 @@ jobs:
       - name: Linting
         run: pnpm lint
 
-      - name: Testing
+      - name: Build and test
         run: pnpm test
-
-      - name: Build
-        run: pnpm build
 
       - name: Create release
         uses: softprops/action-gh-release@6cbd405e2c4e67a21c47fa9e383d020e4e28b836 # v2.3.3
