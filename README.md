@@ -1,6 +1,6 @@
 # @morev/console-css
 
-The library to style browser console messages.
+Style browser and Node.js console messages with HTML and CSS.
 
 [![Build](https://github.com/MorevM/console-css/actions/workflows/build.yaml/badge.svg?branch=master)](https://github.com/MorevM/console-css/actions/workflows/build.yaml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -81,10 +81,32 @@ pnpm add @morev/console-css
 
 ## Usage
 
-The package exports the ConsoleCSS class instance that considered singleton. \
-If used directly in HTML without any bundler - it's available via `window.ConsoleCSS`.
+Use the same import in a browser application and in Node.js. The package selects the renderer for the environment.
+The UMD build also exposes `window.ConsoleCSS` when loaded directly with a script tag.
 
-> **Important:** The package only works in browser. It doesn't fall but does nothing on server side.
+```js
+import ConsoleCSS from '@morev/console-css';
+
+ConsoleCSS.add('.success { color: #087672; }');
+ConsoleCSS.styled.log('<b class="success">Build ready</b> · <u>%d checks passed</u>', 3);
+```
+
+### Terminal output
+
+| Input | Browser DevTools | Node.js terminal |
+| --- | --- | --- |
+| `<b>`, `<i>`, `<u>`, `<s>` | Styled text | Bold, italic, underline and strikethrough, subject to terminal support |
+| `color`, `background-color`, solid `background` | CSS colors | Opaque colors mapped to the terminal palette |
+| `font-size`, `padding`, borders | Applied when supported by DevTools | Text at the terminal's normal size and spacing |
+| `<img>` with a source and dimensions | Image when the console permits the source | The `alt` text, or an empty string when omitted |
+
+Tag rules, class rules and inline styles use the same precedence in both environments.
+The terminal renderer also recognizes `font-weight`, `font-style`, `text-decoration` and `text-decoration-line`.
+Native console substitutions and trailing objects are formatted by the destination console.
+
+Node.js detects colors separately for stdout and stderr. Redirecting a stream to a file or pipe produces plain text by default.
+Set `NO_COLOR=1` to disable styling or `FORCE_COLOR` to select a level (`0` off, `1` basic, `2` 256 colors, `3` truecolor).
+An explicit `FORCE_COLOR` takes precedence.
 
 ### Default styles
 
@@ -121,9 +143,9 @@ ConsoleCSS.add(`
 ConsoleCSS.styled.log('<span class="block">Red underlined text</span>');
 ```
 
-### Override the default `window.console` object
+### Override the global console
 
-That might be annoying to remember about custom styled messages class, so the library provides a way to replace global `window.console`
+Use `override()` to style calls to the global `console` object in either environment.
 
 ```ts
 import ConsoleCSS from '@morev/console-css';
@@ -137,7 +159,7 @@ ConsoleCSS.override();
 
 console.log('Wow, <span class="block">a styled message</span> using native `console.log`!');
 
-// Restore the original `window.console`
+// Restore the original console
 ConsoleCSS.restore();
 
 console.log('No longer <span class="block">styled</span> messages :(');
@@ -152,5 +174,6 @@ pnpm install
 pnpm dev
 ```
 
-Open the playground at `http://localhost:3000` and inspect the browser console.
-Run `pnpm test` to build the package and check its TypeScript declarations and browser behavior.
+Open the playground at `http://localhost:3000`. Open DevTools and click **Print to both consoles**
+to compare its output with the terminal running `pnpm dev`.
+Run `pnpm test` to build the package and check its declarations, playground types and output in both environments.
