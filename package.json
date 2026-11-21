@@ -1,6 +1,6 @@
 {
 	"name": "@morev/console-css",
-	"description": "Style browser console messages with CSS",
+	"description": "Style browser and Node.js console messages with CSS",
 	"type": "module",
 	"private": false,
 	"version": "0.0.5",
@@ -24,30 +24,39 @@
 		"url": "https://github.com/MorevM/console-css"
 	},
 	"keywords": [
+		"ansi",
 		"browser",
 		"console",
 		"console-log",
 		"css",
 		"devtools",
 		"logging",
-		"styled-console"
+		"nodejs",
+		"styled-console",
+		"terminal"
 	],
 	"files": [
 		"dist"
 	],
 	"exports": {
 		".": {
-			"import": {
-				"types": "./dist/console-css.d.ts",
-				"default": "./dist/console-css.es.js"
-			},
-			"require": {
+			"node": {
 				"types": "./dist/console-css.d.cts",
-				"default": "./dist/console-css.cjs"
+				"default": "./dist/node.cjs"
+			},
+			"default": {
+				"import": {
+					"types": "./dist/console-css.d.ts",
+					"default": "./dist/console-css.es.js"
+				},
+				"require": {
+					"types": "./dist/console-css.d.cts",
+					"default": "./dist/console-css.cjs"
+				}
 			}
 		}
 	},
-	"main": "./dist/console-css.cjs",
+	"main": "./dist/node.cjs",
 	"module": "./dist/console-css.es.js",
 	"browser": "./dist/console-css.umd.js",
 	"types": "./dist/console-css.d.ts",
@@ -62,6 +71,12 @@
 		"lint:eslint:fix": "eslint . --fix",
 		"test": "pnpm build && tsc -p tests/tsconfig.json && vitest run --environment jsdom",
 		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"chalk": "^4.1.2",
+		"colord": "^2.14.0",
+		"inline-style-parser": "^0.2.9",
+		"parse5": "^7.3.0"
 	},
 	"devDependencies": {
 		"@commitlint/cli": "^21.2.4",
