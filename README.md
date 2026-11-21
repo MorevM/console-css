@@ -2,12 +2,11 @@
 
 The library to style browser console messages.
 
-![Stability of "master" branch](https://img.shields.io/github/workflow/status/MorevM/console-css/Build/master)
+[![Build](https://github.com/MorevM/console-css/actions/workflows/build.yaml/badge.svg?branch=master)](https://github.com/MorevM/console-css/actions/workflows/build.yaml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![Last commit](https://img.shields.io/github/last-commit/morevm/console-css)
 ![Release version](https://img.shields.io/github/v/release/morevm/console-css?include_prereleases)
 ![GitHub Release Date](https://img.shields.io/github/release-date/morevm/console-css)
-![Keywords](https://img.shields.io/github/package-json/keywords/morevm/console-css)
 
 ## Why?
 
@@ -143,3 +142,15 @@ ConsoleCSS.restore();
 
 console.log('No longer <span class="block">styled</span> messages :(');
 ```
+
+## Development
+
+Use Node.js 24 and the pnpm version pinned in `package.json`.
+
+```sh
+pnpm install
+pnpm dev
+```
+
+Open the playground at `http://localhost:3000` and inspect the browser console.
+Run `pnpm test` to build the package and check its TypeScript declarations and browser behavior.

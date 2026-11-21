@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>ConsoleCSS playground</title>
+		<meta
+			name="description"
+			content="Try CSS-styled messages in the browser console."
+		/>
+	</head>
+	<body>
+		<p>Open the browser console to see the styled message.</p>
+
+		<script type="module">
+			import ConsoleCSS from '../src/index.ts';
+
+			ConsoleCSS.add('.notice { color: rebeccapurple; }');
+			ConsoleCSS.styled.log('<b class="notice">Hello</b> from ConsoleCSS');
+		</script>
+	</body>
+</html>
