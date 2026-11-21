@@ -38,4 +38,26 @@ describe('ConsoleCSS', () => {
 
 		expect(log).toHaveBeenCalledWith('%cgiven <b> then %c%cend%c', '', '', expect.stringContaining('italic'), '');
 	});
+
+	it('Keeps text around multiple images and preserves their individual styles', () => {
+		const log = vi.spyOn(window.console, 'log').mockImplementation(() => {});
+
+		const first = '<img src="first?a=b" width="10" height="8">';
+		const second = '<img src="second" width="20" height="6"/>';
+		ConsoleCSS.styled.log(`A${first}B${second}C`);
+
+		expect(log).toHaveBeenCalledWith(
+			'%cA%c%c %c%cB%c%c %c%cC%c',
+			'',
+			'',
+			expect.stringContaining('first?a=b'),
+			'',
+			'',
+			'',
+			expect.stringContaining('second'),
+			'',
+			'',
+			'',
+		);
+	});
 });

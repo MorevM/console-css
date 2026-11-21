@@ -42,7 +42,8 @@ class ConsoleCSS {
 		if (!isString(message)) return [message, ...rest];
 
 		const template = document.createElement('template');
-		template.innerHTML = formatImages(message);
+		template.innerHTML = message;
+		formatImages(template.content);
 
 		const substitutions: unknown[] = [];
 		const render = (parent: ParentNode, style: string): string => {
