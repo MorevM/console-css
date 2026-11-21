@@ -30,4 +30,12 @@ describe('ConsoleCSS', () => {
 
 		expect(log).toHaveBeenCalledWith('%c%%s %d %o %s %o %o%c', '', 0, false, '', null, undefined, '', 'tail');
 	});
+
+	it('Keeps escaped tags literal beside a styled element', () => {
+		const log = vi.spyOn(window.console, 'log').mockImplementation(() => {});
+
+		ConsoleCSS.styled.log('given &lt;b&gt; then <i>end</i>');
+
+		expect(log).toHaveBeenCalledWith('%cgiven <b> then %c%cend%c', '', '', expect.stringContaining('italic'), '');
+	});
 });

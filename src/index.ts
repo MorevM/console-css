@@ -1,5 +1,5 @@
-import { arrayUnique, isFunction, isServer, isString, tsObject } from '@morev/utils';
-import { formatImages, getChildNodes } from './utils';
+import { arrayUnique, isElement, isFunction, isServer, isString, tsObject } from '@morev/utils';
+import { formatImages } from './utils';
 import type { Declaration } from './types';
 
 class ConsoleCSS {
@@ -7,14 +7,10 @@ class ConsoleCSS {
 
 	#originalConsole = console;
 
-	#restParams: unknown[] = [];
-
 	#isOverride: boolean = false;
 
-	#substitutions: unknown[] = [];
-
 	#applyStyles(node: Element) {
-		if (!this.#declarations.length || node.nodeType === 3) return [];
+		if (!this.#declarations.length) return [];
 		const [tagName, classNames] = [node.nodeName.toLowerCase(), [...node.classList]];
 		const rulesFromTag = this.#declarations
 			.filter((d) => d.type === 'tag' && d.entity === tagName)
@@ -26,53 +22,53 @@ class ConsoleCSS {
 		return [...rulesFromTag, ...rulesFromClassnames];
 	}
 
-	#parseNode(html: string, inheritedStyles = ''): string {
-		html = formatImages(html);
-		const children = getChildNodes(html);
+	#elementStyle(node: Element, inheritedStyle: string) {
+		const styles = inheritedStyle ? [inheritedStyle] : [];
+		if (node instanceof HTMLElement && node.style.cssText) styles.push(node.style.cssText);
 
-		if (children.length === 1 && children[0].nodeType === 3) {
-			this.#substitutions.push(inheritedStyles);
-			const content = (children[0].textContent ?? '').replaceAll(/%%|%[Ocdfios]|%\.\d+[dfi]/g, (token) => {
-				if (token === '%%') return token;
-				if (!this.#restParams.length) return '';
-				this.#substitutions.push(this.#restParams.shift());
-				return token;
-			});
-			this.#substitutions.push('');
-			return `%c${content}%c`;
+		switch (node.localName) {
+			case 'b': styles.unshift('font-weight: bold'); break;
+			case 'i': styles.unshift('font-style: italic'); break;
+			case 'u': styles.unshift('text-decoration: underline'); break;
+			case 's': styles.unshift('text-decoration: line-through'); break;
+			default: break;
 		}
 
-		return children.reduce<string>((acc, child) => {
-			if (child.nodeType !== 1 && child.nodeType !== 3) return acc;
-
-			const childStyle = inheritedStyles.split(';');
-			if (child instanceof HTMLElement) {
-				child.style.cssText && childStyle.push(...child.style.cssText.split(';').map((i) => i.trim()));
-			}
-
-			switch (child.nodeName.toLowerCase()) {
-				case 'b': childStyle.unshift('font-weight: bold'); break;
-				case 'i': childStyle.unshift('font-style: italic'); break;
-				case 'u': childStyle.unshift('text-decoration: underline'); break;
-				case 's': childStyle.unshift('text-decoration: line-through'); break;
-				default: break;
-			}
-
-			childStyle.push(...this.#applyStyles(child));
-
-			return acc + this.#parseNode(
-				child.innerHTML || (child.textContent ?? ''),
-				childStyle.join(';'),
-			);
-		}, '');
+		styles.push(...this.#applyStyles(node));
+		return styles.join(';');
 	}
 
 	#style(message: unknown, ...rest: unknown[]) {
 		if (!isString(message)) return [message, ...rest];
-		this.#restParams = rest;
-		const result = [this.#parseNode(message, ''), ...this.#substitutions];
-		this.#substitutions = [];
-		return [...result, ...this.#restParams];
+
+		const template = document.createElement('template');
+		template.innerHTML = formatImages(message);
+
+		const substitutions: unknown[] = [];
+		const render = (parent: ParentNode, style: string): string => {
+			let format = '';
+			for (const child of parent.childNodes) {
+				if (isElement(child)) {
+					format += render(child, this.#elementStyle(child, style));
+					continue;
+				}
+				if (child.nodeType !== Node.TEXT_NODE) continue;
+
+				substitutions.push(style);
+				const content = (child.textContent ?? '').replaceAll(/%%|%[Ocdfios]|%\.\d+[dfi]/g, (token) => {
+					if (token === '%%') return token;
+					if (!rest.length) return '';
+					substitutions.push(rest.shift());
+					return token;
+				});
+				substitutions.push('');
+				format += `%c${content}%c`;
+			}
+			return format;
+		};
+
+		const format = render(template.content, '');
+		return [format, ...substitutions, ...rest];
 	}
 
 	#map() {

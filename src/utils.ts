@@ -16,12 +16,6 @@ export const replaceBetween = (origin: string, start: number, end: number, repla
 	return origin.slice(0, start) + replacement + origin.slice(end);
 };
 
-export const getChildNodes = (html: string) => {
-	const div = document.createElement('div');
-	div.innerHTML = html;
-	return [...div.childNodes] as Element[];
-};
-
 export const generateImageFromAttrs = (attrs: PlainObject<string>) => {
 	if (!attrs.src || !attrs.width || !attrs.height) return '';
 
