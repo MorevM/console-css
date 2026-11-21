@@ -99,4 +99,30 @@ describe('ConsoleCSS', () => {
 
 		expect(log).toHaveBeenCalledWith('%cok%c', 'color: blue;color: red', '');
 	});
+
+	it('Passes timer labels and calls without arguments through override', () => {
+		const timer = vi.spyOn(window.console, 'time').mockImplementation(() => {});
+		const end = vi.spyOn(window.console, 'groupEnd').mockImplementation(() => {});
+		const log = vi.spyOn(window.console, 'log').mockImplementation(() => {});
+		ConsoleCSS.override();
+
+		window.console.time('load');
+		window.console.groupEnd();
+		window.console.log();
+
+		expect(timer).toHaveBeenCalledWith('load');
+		expect(end).toHaveBeenCalledWith();
+		expect(log).toHaveBeenCalledWith();
+	});
+
+	it('Formats assertion messages after the condition', () => {
+		const assertion = vi.spyOn(window.console, 'assert').mockImplementation(() => {});
+		ConsoleCSS.override();
+
+		window.console.assert(false, '<b>failed %d</b>', 0);
+		window.console.assert(false);
+
+		expect(assertion).toHaveBeenNthCalledWith(1, false, '%cfailed %d%c', 'font-weight: bold', 0, '');
+		expect(assertion).toHaveBeenNthCalledWith(2, false);
+	});
 });

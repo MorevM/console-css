@@ -2,6 +2,10 @@ import { isElement, isFunction, isServer, isString, tsObject } from '@morev/util
 import { formatImages } from './utils';
 import type { Declaration } from './types';
 
+const MESSAGE_METHODS = new Set<keyof Console>([
+	'debug', 'error', 'group', 'groupCollapsed', 'info', 'log', 'trace', 'warn',
+]);
+
 class ConsoleCSS {
 	readonly #declarations = new Map<string, Declaration>();
 
@@ -30,9 +34,7 @@ class ConsoleCSS {
 		return styles.filter(Boolean).join(';');
 	}
 
-	#style(message: unknown, ...rest: unknown[]) {
-		if (!isString(message)) return [message, ...rest];
-
+	#style(message: string, ...rest: unknown[]) {
 		const template = document.createElement('template');
 		template.innerHTML = message;
 		formatImages(template.content);
@@ -69,8 +71,15 @@ class ConsoleCSS {
 		const styled = { ...original };
 		for (const [method, callback] of tsObject.entries(original)) {
 			if (!isFunction(callback)) continue;
-			Reflect.set(styled, method, (message?: unknown, ...rest: unknown[]) =>
-				Reflect.apply(callback, original, this.#style(message, ...rest)));
+			Reflect.set(styled, method, (...args: unknown[]) => {
+				if (MESSAGE_METHODS.has(method) && isString(args[0])) {
+					return Reflect.apply(callback, original, this.#style(args[0], ...args.slice(1)));
+				}
+				if (method === 'assert' && !args[0] && isString(args[1])) {
+					return Reflect.apply(callback, original, [args[0], ...this.#style(args[1], ...args.slice(2))]);
+				}
+				return Reflect.apply(callback, original, args);
+			});
 		}
 		return styled;
 	}
