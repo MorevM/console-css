@@ -1,6 +1,6 @@
 import { arrayUnique, isFunction, isServer, isString, tsObject } from '@morev/utils';
+import { formatImages, getChildNodes, replaceBetween } from './utils';
 import type { Declaration } from './types';
-import { replaceBetween, getChildNodes, formatImages } from './utils';
 
 class ConsoleCSS {
 	#declarations: Declaration[] = [];
@@ -12,6 +12,85 @@ class ConsoleCSS {
 	#isOverride: boolean = false;
 
 	#substitutions: unknown[] = [];
+
+	#applyStyles(node: Element) {
+		if (!this.#declarations.length || node.nodeType === 3) return [];
+		const [tagName, classNames] = [node.nodeName.toLowerCase(), [...node.classList]];
+		const rulesFromTag = this.#declarations
+			.filter((d) => d.type === 'tag' && d.entity === tagName)
+			.reduce<string[]>((acc, d) => [...acc, ...d.rules], []);
+		const rulesFromClassnames = this.#declarations
+			.filter((d) => d.type === 'class' && classNames.includes(d.entity))
+			.reduce<string[]>((acc, d) => [...acc, ...d.rules], []);
+
+		return [...rulesFromTag, ...rulesFromClassnames];
+	}
+
+	#parseNode(html: string, inheritedStyles = ''): string {
+		html = formatImages(html);
+		const children = getChildNodes(html);
+
+		if (children.length === 1 && children[0].nodeType === 3) {
+			this.#substitutions.push(inheritedStyles);
+			let content = children[0].textContent ?? '';
+			const substitutionsInside = [...content.matchAll(/%[Odfios]|%\.\d+[dfi]/g)];
+			let difference = 0;
+			substitutionsInside.forEach((match) => {
+				const substitution = this.#restParams.shift();
+				if (substitution) {
+					this.#substitutions.push(substitution);
+				} else {
+					content = replaceBetween(content, match.index - difference, match.index - difference + match[0].length);
+					difference += match[0].length;
+				}
+			});
+			this.#substitutions.push('');
+			return `%c${content}%c`;
+		}
+
+		return children.reduce<string>((acc, child) => {
+			if (child.nodeType !== 1 && child.nodeType !== 3) return acc;
+
+			const childStyle = inheritedStyles.split(';');
+			if (child instanceof HTMLElement) {
+				child.style.cssText && childStyle.push(...child.style.cssText.split(';').map((i) => i.trim()));
+			}
+
+			switch (child.nodeName.toLowerCase()) {
+				case 'b': childStyle.unshift('font-weight: bold'); break;
+				case 'i': childStyle.unshift('font-style: italic'); break;
+				case 'u': childStyle.unshift('text-decoration: underline'); break;
+				case 's': childStyle.unshift('text-decoration: line-through'); break;
+				default: break;
+			}
+
+			childStyle.push(...this.#applyStyles(child));
+
+			return acc + this.#parseNode(
+				child.innerHTML || (child.textContent ?? ''),
+				childStyle.join(';'),
+			);
+		}, '');
+	}
+
+	#style(message: unknown, ...rest: unknown[]) {
+		if (!isString(message)) return [message, ...rest];
+		this.#restParams = rest;
+		const result = [this.#parseNode(message, ''), ...this.#substitutions];
+		this.#substitutions = [];
+		return [...result, ...this.#restParams];
+	}
+
+	#map() {
+		const original = this.#originalConsole;
+		const styled = { ...original };
+		for (const [method, callback] of tsObject.entries(original)) {
+			if (!isFunction(callback)) continue;
+			Reflect.set(styled, method, (message?: unknown, ...rest: unknown[]) =>
+				Reflect.apply(callback, original, this.#style(message, ...rest)));
+		}
+		return styled;
+	}
 
 	/**
 	 * Overrides the `window.console` with `ConsoleCSS` to allow usage
@@ -57,10 +136,7 @@ class ConsoleCSS {
 	}
 
 	/**
-	 * Adds a potion of custom CSS rules. \
-	 * Can be used multiple times.
-	 *
-	 * @param   input   CSS-like string with custom rules.
+	 * Adds custom CSS rules to the current set.
 	 *
 	 * @example
 	 *  ConsoleCSS.add(`
@@ -73,19 +149,21 @@ class ConsoleCSS {
 	 *  `);
 	 *  ConsoleCSS.styled.log('<span class="block">Some block</span>');
 	 *  ConsoleCSS.styled.log('<b>Bold red text</b>');
+	 *
+	 * @param   input   CSS-like string with custom rules.
 	 */
 	public add(input: string) {
-		(input.match(/.+?\s{.+?}/gs) ?? []).map(i => i.replace(/\s+/g, ' '))
-			.forEach(declaration => {
-				const [_, _entity, _rules] = (declaration.match(/(.*){(.*)}/) ?? []).map(i => i.trim());
+		(input.match(/.+?\s{.+?}/gs) ?? []).map((i) => i.replaceAll(/\s+/g, ' '))
+			.forEach((declaration) => {
+				const [_, _entity, _rules] = (declaration.match(/(.*){(.*)}/) ?? []).map((i) => i.trim());
 				if (!_entity || !_rules) return;
 
 				const type = _entity.startsWith('.') ? 'class' : 'tag';
 				const entity = _entity.startsWith('.') ? _entity.slice(1) : _entity.toLowerCase();
-				const rules = arrayUnique(_rules.split(';').map(r => r.trim()).filter(Boolean));
+				const rules = arrayUnique(_rules.split(';').map((r) => r.trim()).filter(Boolean));
 
 				const alreadyCreated = this.#declarations
-					.find(d => d.type === type && d.entity === entity);
+					.find((d) => d.type === type && d.entity === entity);
 
 				if (alreadyCreated) {
 					alreadyCreated.rules.push(...rules);
@@ -103,85 +181,6 @@ class ConsoleCSS {
 	 */
 	public get styled(): Console {
 		return isServer() ? console : this.#map();
-	}
-
-	#applyStyles(node: Element) {
-		if (!this.#declarations.length || node.nodeType === 3) return [];
-		const [tagName, classNames] = [node.nodeName.toLowerCase(), [...node.classList]];
-		const rulesFromTag = this.#declarations
-			.filter(d => d.type === 'tag' && d.entity === tagName)
-			.reduce<string[]>((acc, d) => [...acc, ...d.rules], []);
-		const rulesFromClassnames = this.#declarations
-			.filter(d => d.type === 'class' && classNames.includes(d.entity))
-			.reduce<string[]>((acc, d) => [...acc, ...d.rules], []);
-
-		return [...rulesFromTag, ...rulesFromClassnames];
-	}
-
-	#parseNode(html: string, inheritedStyles = ''): string {
-		html = formatImages(html);
-		const children = getChildNodes(html);
-
-		if (children.length === 1 && children[0].nodeType === 3) {
-			this.#substitutions.push(inheritedStyles);
-			let content = children[0].textContent ?? '';
-			const substitutionsInside = [...content.matchAll(/%[Odfios]|%\.\d+[dfi]/g)];
-			let difference = 0;
-			substitutionsInside.forEach((match) => {
-				const substitution = this.#restParams.shift();
-				if (substitution) {
-					this.#substitutions.push(substitution);
-				} else {
-					content = replaceBetween(content, match.index! - difference, match.index! - difference + match[0].length);
-					difference += match[0].length;
-				}
-			});
-			this.#substitutions.push('');
-			return `%c${content}%c`;
-		}
-
-		return children.reduce<string>((acc, child) => {
-			if (child.nodeType !== 1 && child.nodeType !== 3) return acc;
-
-			const childStyle = inheritedStyles.split(';');
-			if (child instanceof HTMLElement) {
-				child.style.cssText && childStyle.push(...child.style.cssText.split(';').map(i => i.trim()));
-			}
-
-			switch (child.nodeName.toLowerCase()) {
-				case 'b': childStyle.unshift('font-weight: bold'); break;
-				case 'i': childStyle.unshift('font-style: italic'); break;
-				case 'u': childStyle.unshift('text-decoration: underline'); break;
-				case 's': childStyle.unshift('text-decoration: line-through'); break;
-				default: break;
-			}
-
-			childStyle.push(...this.#applyStyles(child));
-
-			return acc + this.#parseNode(
-				child.innerHTML || (child.textContent ?? ''),
-				childStyle.join(';'),
-			);
-		}, '');
-	}
-
-	#style(message: unknown, ...rest: unknown[]) {
-		if (!isString(message)) return [message, ...rest];
-		this.#restParams = rest;
-		const result = [this.#parseNode(message, ''), ...this.#substitutions];
-		this.#substitutions = [];
-		return [...result, ...this.#restParams];
-	}
-
-	#map() {
-		const original = this.#originalConsole;
-		const styled = { ...original };
-		for (const [method, callback] of tsObject.entries(original)) {
-			if (!isFunction(callback)) continue;
-			Reflect.set(styled, method, (message?: unknown, ...rest: unknown[]) =>
-				Reflect.apply(callback, original, this.#style(message, ...rest)));
-		}
-		return styled;
 	}
 }
 

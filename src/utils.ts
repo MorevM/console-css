@@ -1,17 +1,15 @@
-import type { PlainObject } from '@morev/utils';
 import { unquote } from '@morev/utils';
+import type { PlainObject } from '@morev/utils';
 
-/* eslint-disable @typescript-eslint/indent */
 const parseImageAttributes = (attrs: string) => attrs
-	.replace(/\s+/g, ' ').trim()
-	.split(' ').map(i => i.trim())
+	.replaceAll(/\s+/g, ' ').trim()
+	.split(' ').map((i) => i.trim())
 	.reduce<PlainObject<string>>((acc, part) => {
 		const [key, value] = part.split('=');
 		if (key === '') return acc;
 		acc[key] = unquote(value) || '';
 		return acc;
-}, {});
-/* eslint-enable @typescript-eslint/indent */
+	}, {});
 
 export const replaceBetween = (origin: string, start: number, end: number, replacement: string = '') => {
 	if (start < 0) start = 0;
@@ -47,14 +45,14 @@ export const generateImageFromAttrs = (attrs: PlainObject<string>) => {
 };
 
 export const formatImages = (html: string) => {
-	const matches = [...html.matchAll(/<img([^>]*)\/?>/g)];
+	const matches = [...html.matchAll(/<img([^>]*)>/g)];
 	if (!matches.length) return html;
 
 	let difference = 0;
-	matches.forEach(match => {
+	matches.forEach((match) => {
 		const attrs = parseImageAttributes(match[1]);
 		const pseudoImage = generateImageFromAttrs(attrs);
-		html = replaceBetween(html, match.index! - difference, match[0].length - difference, pseudoImage);
+		html = replaceBetween(html, match.index - difference, match[0].length - difference, pseudoImage);
 		difference += match[0].length - pseudoImage.length;
 	});
 

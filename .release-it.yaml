@@ -9,6 +9,8 @@ npm:
 plugins:
   '@release-it/conventional-changelog':
     infile: CHANGELOG.md
+    context:
+      repository: console-css
     preset:
       name: conventionalcommits
       types:
@@ -39,7 +41,7 @@ plugins:
 hooks:
   before:init:
     - pnpm lint:fix
-    - pnpm build
+    - pnpm typecheck
   after:init:
     - pnpm lint
     - pnpm test

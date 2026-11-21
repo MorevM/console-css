@@ -1,2 +1,10 @@
 allowBuilds:
   esbuild: true
+  lefthook: true
+  unrs-resolver: true
+
+# The release preset is imported from the loader's own dependency tree.
+packageExtensions:
+  conventional-changelog-preset-loader@6:
+    dependencies:
+      conventional-changelog-conventionalcommits: ^10.4.1
