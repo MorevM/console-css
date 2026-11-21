@@ -1,5 +1,5 @@
 import { arrayUnique, isFunction, isServer, isString, tsObject } from '@morev/utils';
-import { formatImages, getChildNodes, replaceBetween } from './utils';
+import { formatImages, getChildNodes } from './utils';
 import type { Declaration } from './types';
 
 class ConsoleCSS {
@@ -32,17 +32,11 @@ class ConsoleCSS {
 
 		if (children.length === 1 && children[0].nodeType === 3) {
 			this.#substitutions.push(inheritedStyles);
-			let content = children[0].textContent ?? '';
-			const substitutionsInside = [...content.matchAll(/%[Odfios]|%\.\d+[dfi]/g)];
-			let difference = 0;
-			substitutionsInside.forEach((match) => {
-				const substitution = this.#restParams.shift();
-				if (substitution) {
-					this.#substitutions.push(substitution);
-				} else {
-					content = replaceBetween(content, match.index - difference, match.index - difference + match[0].length);
-					difference += match[0].length;
-				}
+			const content = (children[0].textContent ?? '').replaceAll(/%%|%[Ocdfios]|%\.\d+[dfi]/g, (token) => {
+				if (token === '%%') return token;
+				if (!this.#restParams.length) return '';
+				this.#substitutions.push(this.#restParams.shift());
+				return token;
 			});
 			this.#substitutions.push('');
 			return `%c${content}%c`;
