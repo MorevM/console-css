@@ -71,4 +71,22 @@ describe('ConsoleCSS', () => {
 			'%cone%c%ctwo%c', expect.stringContaining('color: red'), '', expect.stringContaining('color: blue'), '',
 		);
 	});
+
+	it('Applies matching classes in source order and gives inline styles precedence', () => {
+		const log = vi.spyOn(window.console, 'log').mockImplementation(() => {});
+		ConsoleCSS.add('.first { color: red; } .second { color: blue; }');
+		ConsoleCSS.add('.first { color: green; } span { color: gray; }');
+
+		ConsoleCSS.styled.log('<span class="second first">A</span><span class="first" style="color: purple">B</span>');
+
+		const [, classStyle, , inlineStyle] = log.mock.calls[0];
+		const { style } = document.createElement('span');
+		style.cssText = classStyle;
+
+		expect(style.color).toBe('green');
+
+		style.cssText = inlineStyle;
+
+		expect(style.color).toBe('purple');
+	});
 });

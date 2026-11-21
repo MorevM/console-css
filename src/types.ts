@@ -10,7 +10,7 @@ export type Declaration = {
 	entity: string;
 
 	/**
-	 * CSS rules related to entity like `font-weight: 700`
+	 * Declaration block applied to every matching element.
 	 */
-	rules: string[];
+	cssText: string;
 };

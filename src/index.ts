@@ -1,4 +1,4 @@
-import { arrayUnique, isElement, isFunction, isServer, isString, tsObject } from '@morev/utils';
+import { isElement, isFunction, isServer, isString, tsObject } from '@morev/utils';
 import { formatImages } from './utils';
 import type { Declaration } from './types';
 
@@ -9,33 +9,25 @@ class ConsoleCSS {
 
 	#isOverride: boolean = false;
 
-	#applyStyles(node: Element) {
-		if (!this.#declarations.length) return [];
-		const [tagName, classNames] = [node.nodeName.toLowerCase(), [...node.classList]];
-		const rulesFromTag = this.#declarations
-			.filter((d) => d.type === 'tag' && d.entity === tagName)
-			.reduce<string[]>((acc, d) => [...acc, ...d.rules], []);
-		const rulesFromClassnames = this.#declarations
-			.filter((d) => d.type === 'class' && classNames.includes(d.entity))
-			.reduce<string[]>((acc, d) => [...acc, ...d.rules], []);
-
-		return [...rulesFromTag, ...rulesFromClassnames];
-	}
-
 	#elementStyle(node: Element, inheritedStyle: string) {
-		const styles = inheritedStyle ? [inheritedStyle] : [];
-		if (node instanceof HTMLElement && node.style.cssText) styles.push(node.style.cssText);
-
+		const styles = [inheritedStyle];
 		switch (node.localName) {
-			case 'b': styles.unshift('font-weight: bold'); break;
-			case 'i': styles.unshift('font-style: italic'); break;
-			case 'u': styles.unshift('text-decoration: underline'); break;
-			case 's': styles.unshift('text-decoration: line-through'); break;
+			case 'b': styles.push('font-weight: bold'); break;
+			case 'i': styles.push('font-style: italic'); break;
+			case 'u': styles.push('text-decoration: underline'); break;
+			case 's': styles.push('text-decoration: line-through'); break;
 			default: break;
 		}
 
-		styles.push(...this.#applyStyles(node));
-		return styles.join(';');
+		const classStyles: string[] = [];
+		for (const { type, entity, cssText } of this.#declarations) {
+			if (type === 'tag' && node.localName === entity) styles.push(cssText);
+			if (type === 'class' && node.classList.contains(entity)) classStyles.push(cssText);
+		}
+		styles.push(...classStyles);
+		if (node instanceof HTMLElement) styles.push(node.style.cssText);
+
+		return styles.filter(Boolean).join(';');
 	}
 
 	#style(message: unknown, ...rest: unknown[]) {
@@ -146,17 +138,12 @@ class ConsoleCSS {
 	public add(input: string) {
 		for (const [, selector, block] of input.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
 			const name = selector.trim();
-			if (!name || !block.trim()) continue;
+			const cssText = block.trim();
+			if (!name || !cssText) continue;
 
 			const type = name.startsWith('.') ? 'class' : 'tag';
 			const entity = type === 'class' ? name.slice(1) : name.toLowerCase();
-			const rules = arrayUnique(block.split(';').map((rule) => rule.trim()).filter(Boolean));
-			const existing = this.#declarations.find((item) => item.type === type && item.entity === entity);
-			if (existing) {
-				existing.rules.push(...rules);
-			} else {
-				this.#declarations.push({ type, entity, rules });
-			}
+			this.#declarations.push({ type, entity, cssText });
 		}
 	}
 
