@@ -61,7 +61,7 @@
 	"browser": "./dist/console-css.umd.js",
 	"types": "./dist/console-css.d.ts",
 	"scripts": {
-		"dev": "vite playground --port 3000",
+		"dev": "pnpm build && vite playground --port 3000",
 		"build": "tsdown",
 		"prepare": "pnpm build && lefthook install",
 		"release": "release-it",
@@ -69,7 +69,7 @@
 		"lint:fix": "pnpm lint:eslint:fix",
 		"lint:eslint": "eslint .",
 		"lint:eslint:fix": "eslint . --fix",
-		"test": "pnpm build && tsc -p tests/tsconfig.json && vitest run --environment jsdom",
+		"test": "pnpm build && tsc -p playground/tsconfig.json && tsc -p tests/tsconfig.json && vitest run --environment jsdom",
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {

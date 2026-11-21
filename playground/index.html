@@ -4,19 +4,62 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>ConsoleCSS playground</title>
+		<style>
+			:root { font: 100%/1.55 Inter, system-ui, sans-serif; color: #253634; background: #f5f7f4; }
+			main { max-width: 42rem; margin: 8vh auto; padding: 0 1.25rem; }
+			h1, h2 { line-height: 1.15; letter-spacing: -0.035em; }
+			h1 { font-size: clamp(2.1rem, 7vw, 3.5rem); }
+			section { padding: 1.4rem 0; border-top: 1px solid #bdcbc4; }
+			h2 { margin: 0; }
+			dl { margin: 1.5rem 0; }
+			dt { font-weight: 650; }
+			dd { margin: 0 0 0.85rem; }
+			button {
+				padding: 0.65rem 1.1rem;
+				border: 0;
+				border-radius: 5px;
+				font: inherit;
+				font-weight: 650;
+				color: white;
+				background: #145750;
+				cursor: pointer;
+			}
+			button:focus-visible { outline: 3px solid #7742a7; outline-offset: 3px; }
+			button:disabled { opacity: 0.65; cursor: wait; }
+			output { display: block; min-height: 1.6em; margin-top: 0.6rem; }
+		</style>
 		<meta
 			name="description"
-			content="Try CSS-styled messages in the browser console."
+			content="Compare CSS-styled messages in DevTools and the Node.js terminal."
 		/>
 	</head>
 	<body>
-		<p>Open the browser console to see the styled message.</p>
-
-		<script type="module">
-			import ConsoleCSS from '../src/index.ts';
-
-			ConsoleCSS.add('.notice { color: rebeccapurple; }');
-			ConsoleCSS.styled.log('<b class="notice">Hello</b> from ConsoleCSS');
-		</script>
+		<main>
+			<h1>ConsoleCSS playground</h1>
+			<section>
+				<h2>Browser console</h2>
+				<p>Open DevTools to see the styled greeting printed on page load.</p>
+			</section>
+			<section>
+				<h2>Compare browser and terminal</h2>
+				<p>
+					Open the DevTools console and the terminal running
+					<code>pnpm dev</code>
+					to compare three messages.
+				</p>
+				<dl>
+					<dt>Build ready</dt>
+					<dd>Look for a bold, colored title and an underlined check count in both consoles.</dd>
+					<dt>Release notes</dt>
+					<dd>Both can show a colored label. DevTools also shows its font size, padding and rounded corners.</dd>
+					<dt>Palette</dt>
+					<dd>DevTools shows a teal swatch. The terminal prints its alternative text.</dd>
+				</dl>
+				<p>A terminal with colors disabled prints all three messages as plain text.</p>
+				<button id="print-comparison" type="button">Print to both consoles</button>
+				<output id="comparison-status" for="print-comparison"></output>
+			</section>
+		</main>
+		<script type="module" src="./main.ts"></script>
 	</body>
 </html>
