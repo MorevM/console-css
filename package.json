@@ -23,6 +23,15 @@
 		"type": "git",
 		"url": "https://github.com/MorevM/console-css"
 	},
+	"keywords": [
+		"browser",
+		"console",
+		"console-log",
+		"css",
+		"devtools",
+		"logging",
+		"styled-console"
+	],
 	"files": [
 		"dist"
 	],
