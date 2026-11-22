@@ -5,6 +5,8 @@ import { stripVTControlCharacters } from 'node:util';
 
 const run = (script: string, colorLevel?: string) => {
 	const env = { ...process.env };
+	// Node 22 writes a proxy startup warning to stderr before the console fixture runs.
+	delete env.NODE_USE_ENV_PROXY;
 	delete env.NO_COLOR;
 	delete env.NODE_DISABLE_COLORS;
 	delete env.FORCE_COLOR;
