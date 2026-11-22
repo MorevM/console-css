@@ -5,6 +5,7 @@ on:
     branches: [master]
   pull_request:
     branches: [master]
+    types: [opened, synchronize, reopened, edited]
 
 jobs:
   lint-and-test:
@@ -15,6 +16,12 @@ jobs:
 
       - name: Setup environment
         uses: ./.github/actions/setup
+
+      - name: Validate the PR title for squash releases
+        if: github.event_name == 'pull_request'
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: printf '%s\n' "$PR_TITLE" | pnpm exec commitlint
 
       - name: Typecheck
         run: pnpm typecheck
