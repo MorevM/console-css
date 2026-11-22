@@ -1,4 +1,29 @@
+# Changelog
 
+## [0.1.0](https://github.com/MorevM/console-css/compare/v0.0.5...v0.1.0) (2026-11-22)
+
+### Use the same styled message in DevTools and Node.js
+
+The same import now works in browser apps and Node.js 20 or later. For example, a build script can print a green, bold status and include the warning count even when it's zero.
+
+```js
+import ConsoleCSS from '@morev/console-css';
+
+ConsoleCSS.styled.log('<b style="color: green">Build complete</b> · %d warnings', 0);
+```
+
+Terminals can display text and background colors, bold, italic, underline and strikethrough. They use their own font size and spacing, and show an image's `alt` text. Redirecting output to a file or pipe produces plain text by default.
+
+### Import the package in TypeScript
+
+TypeScript now finds the bundled declarations for both ESM and CommonJS. Importing from `@morev/console-css` gives you type checking and editor completion for methods such as `add()` and `styled.log()`.
+
+### More reliable browser console output
+
+- Substitutions keep values such as `0`, `false` and `''` in the right positions. Objects passed after the message remain available to inspect in DevTools.
+- Escaped markup such as `&lt;b&gt;` prints literally next to styled text. Messages with several images keep the text between them and each image's own dimensions.
+- Compact rules such as `.build-status{color:green}` now work. When classes set the same property, their definition order decides which value wins. Inline styles take precedence over class rules.
+- With `override()` enabled, `console.time()` and `console.timeEnd()` keep their labels, and `console.assert()` formats the message after the condition.
 
 ### [0.0.5](https://github.com/MorevM/console-css/compare/v0.0.4...v0.0.5) (2022-10-26)
 
