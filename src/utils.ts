@@ -1,62 +1,30 @@
-import type { PlainObject } from '@morev/helpers';
-import { unquote } from '@morev/helpers';
+export const formatImages = (fragment: DocumentFragment) => {
+	for (const image of fragment.querySelectorAll('img')) {
+		const src = image.getAttribute('src');
+		const width = image.getAttribute('width');
+		const height = image.getAttribute('height');
+		if (!src || !width || !height) {
+			image.remove();
+			continue;
+		}
 
-/* eslint-disable @typescript-eslint/indent */
-const parseImageAttributes = (attrs: string) => attrs
-	.replace(/\s+/g, ' ').trim()
-	.split(' ').map(i => i.trim())
-	.reduce<PlainObject<string>>((acc, part) => {
-		const [key, value] = part.split('=');
-		if (key === '') return acc;
-		acc[key] = unquote(value) || '';
-		return acc;
-}, {});
-/* eslint-enable @typescript-eslint/indent */
+		const halfWidth = `${Number.parseFloat(width) / 2}px`;
+		const halfHeight = `${Number.parseFloat(height) / 2}px`;
+		const placeholder = image.ownerDocument.createElement('span');
 
-export const replaceBetween = (origin: string, start: number, end: number, replacement: string = '') => {
-	if (start < 0) start = 0;
-	return origin.slice(0, start) + replacement + origin.slice(end);
-};
-
-export const getChildNodes = (html: string) => {
-	const div = document.createElement('div');
-	div.innerHTML = html;
-	return [...div.childNodes] as Element[];
-};
-
-export const generateImageFromAttrs = (attrs: PlainObject<string>) => {
-	if (!attrs.src || !attrs.width || !attrs.height) return '';
-
-	const halfW = `${parseFloat(attrs.width) / 2}px`;
-	const halfH = `${parseFloat(attrs.height) / 2}px`;
-
-	const a = [
-		`background-image: url(${attrs.src})`,
-		`background-position: center center`,
-		`background-size: cover`,
-		`background-repeat: no-repeat`,
-		`font-size: 0`,
-		`line-height: 0`,
-		`padding-left: ${halfW}`,
-		`padding-right: ${halfW}`,
-		`padding-top: ${halfH}`,
-		`padding-bottom: ${halfH}`,
-	];
-
-	return `<span style="${a.join('; ')}"> </span>`;
-};
-
-export const formatImages = (html: string) => {
-	const matches = [...html.matchAll(/<img([^>]*)\/?>/g)];
-	if (!matches.length) return html;
-
-	let difference = 0;
-	matches.forEach(match => {
-		const attrs = parseImageAttributes(match[1]);
-		const pseudoImage = generateImageFromAttrs(attrs);
-		html = replaceBetween(html, match.index! - difference, match[0].length - difference, pseudoImage);
-		difference += match[0].length - pseudoImage.length;
-	});
-
-	return html;
+		Object.assign(placeholder.style, {
+			backgroundImage: `url(${JSON.stringify(src)})`,
+			backgroundPosition: 'center center',
+			backgroundSize: 'cover',
+			backgroundRepeat: 'no-repeat',
+			fontSize: '0',
+			lineHeight: '0',
+			paddingLeft: halfWidth,
+			paddingRight: halfWidth,
+			paddingTop: halfHeight,
+			paddingBottom: halfHeight,
+		});
+		placeholder.textContent = ' ';
+		image.replaceWith(placeholder);
+	}
 };

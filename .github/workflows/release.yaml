@@ -4,39 +4,35 @@ on:
   push:
     tags: [v*]
 
+permissions:
+  contents: write
+  id-token: write
+
 jobs:
   release:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
-      - name: Setup Node
-        uses: actions/setup-node@v2
-        with:
-          node-version: '16'
-          cache: yarn
-          scope: '@morev'
-          registry-url: 'https://registry.npmjs.org'
+      - name: Setup environment
+        uses: ./.github/actions/setup
 
-      - name: Install dependencies
-        run: yarn install
+      - name: Typecheck
+        run: pnpm typecheck
 
       - name: Linting
-        run: yarn lint
+        run: pnpm lint
 
-      - name: Testing
-        run: yarn test
-
-      - name: Build
-        run: yarn build
+      - name: Build and test
+        run: pnpm test
 
       - name: Create release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@6cbd405e2c4e67a21c47fa9e383d020e4e28b836 # v2.3.3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish package
-        run: yarn publish --access public
+        run: pnpm publish --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

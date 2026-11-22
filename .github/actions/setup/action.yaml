@@ -1,0 +1,19 @@
+name: Setup
+description: Install the pinned pnpm version and project dependencies
+runs:
+  using: composite
+  steps:
+    - name: Setup PNPM
+      uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+
+    - name: Setup Node
+      uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+      with:
+        node-version-file: .node-version
+        cache: pnpm
+        scope: '@morev'
+        registry-url: https://registry.npmjs.org
+
+    - name: Install dependencies
+      shell: bash
+      run: pnpm install --frozen-lockfile

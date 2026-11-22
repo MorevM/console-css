@@ -1,0 +1,14 @@
+commit-msg:
+  commands:
+    commitlint:
+      skip: [merge, rebase]
+      run: pnpm exec commitlint --edit "{1}"
+
+pre-commit:
+  commands:
+    eslint:
+      glob: '*.{js,cjs,ts,mts,json,json5,jsonc,yml,yaml,html}'
+      exclude: pnpm-lock.yaml
+      skip: [merge, rebase]
+      run: pnpm exec eslint {staged_files} --fix
+      stage_fixed: true
