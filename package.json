@@ -69,7 +69,7 @@
 		"lint:fix": "pnpm lint:eslint:fix",
 		"lint:eslint": "eslint .",
 		"lint:eslint:fix": "eslint . --fix",
-		"test": "pnpm build && tsc -p playground/tsconfig.json && tsc -p tests/tsconfig.json && vitest run --environment jsdom",
+		"test": "pnpm build && tsc -p playground/tsconfig.json && tsc -p tests/tsconfig.json && vitest run",
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {

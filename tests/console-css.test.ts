@@ -1,5 +1,6 @@
+// @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import ConsoleCSS from '@morev/console-css';
+import ConsoleCSS from '../dist/console-css.cjs';
 
 describe('ConsoleCSS', () => {
 	afterEach(() => {
